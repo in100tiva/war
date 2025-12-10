@@ -327,3 +327,20 @@ export const TERRITORIES: Record<string, {
     center: { x: 785, y: 520 },
   },
 };
+
+// Helper para verificar se dois territorios sao vizinhos
+export function areNeighbors(territory1: string, territory2: string): boolean {
+  const t1 = TERRITORIES[territory1];
+  if (!t1) return false;
+  return t1.neighbors.includes(territory2);
+}
+
+// Helper para pegar vizinhos de um territorio
+export function getNeighbors(territoryId: string): string[] {
+  return TERRITORIES[territoryId]?.neighbors || [];
+}
+
+// Helper para pegar continente de um territorio
+export function getContinent(territoryId: string): string | null {
+  return TERRITORIES[territoryId]?.continent || null;
+}
