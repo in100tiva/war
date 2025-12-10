@@ -1,10 +1,13 @@
+import { useState } from 'react';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { useGameStore } from '../stores/gameStore';
 import { playSound } from '../lib/audio';
+import { ChatPanel } from './ChatPanel';
 
 export function LobbyScreen() {
   const { roomId, roomCode, userId, setScreen, setRoom } = useGameStore();
+  const [showChat, setShowChat] = useState(true); // Chat aberto por padrao no lobby
 
   const room = useQuery(api.rooms.get, roomId ? { roomId } : 'skip');
   const players = useQuery(api.rooms.getPlayers, roomId ? { roomId } : 'skip');
@@ -178,6 +181,16 @@ export function LobbyScreen() {
           </div>
         )}
       </div>
+
+      {/* Chat */}
+      {roomId && userId && (
+        <ChatPanel
+          roomId={roomId}
+          userId={userId}
+          isCollapsed={!showChat}
+          onToggle={() => setShowChat(!showChat)}
+        />
+      )}
     </div>
   );
 }

@@ -79,12 +79,15 @@ body {
   to { opacity: 1; transform: translateX(0); }
 }
 
-.animate-pulse { animation: pulse 2s infinite; }
-.animate-bounce { animation: bounce 1s infinite; }
-.animate-shake { animation: shake 0.5s; }
-.animate-roll-dice { animation: roll-dice 0.5s ease-out; }
-.animate-fade-in { animation: fade-in 0.3s ease-out; }
-.animate-slide-in { animation: slide-in-right 0.3s ease-out; }
+/* Classe customizadas de animacao (nao usar @apply do Tailwind) */
+@layer utilities {
+  .animate-custom-pulse { animation: pulse 2s infinite; }
+  .animate-custom-bounce { animation: bounce 1s infinite; }
+  .animate-shake { animation: shake 0.5s; }
+  .animate-roll-dice { animation: roll-dice 0.5s ease-out; }
+  .animate-fade-in { animation: fade-in 0.3s ease-out; }
+  .animate-slide-in { animation: slide-in-right 0.3s ease-out; }
+}
 
 /* Estilos para o mapa */
 .territory {
@@ -199,7 +202,7 @@ body {
   @apply fixed bottom-4 left-1/2 -translate-x-1/2 z-50;
   @apply px-6 py-3 rounded-lg shadow-lg;
   @apply bg-rose-500/90 text-white font-medium;
-  @apply animate-fade-in;
+  animation: fade-in 0.3s ease-out;
 }
 
 /* Modal */
@@ -210,6 +213,6 @@ body {
 .modal-content {
   @apply bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl p-6;
   @apply border-2 border-rose-500 shadow-2xl;
-  @apply animate-fade-in;
   @apply max-w-lg w-full mx-4;
+  animation: fade-in 0.3s ease-out;
 }

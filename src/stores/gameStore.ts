@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Id } from '../../convex/_generated/dataModel';
+import type { Id } from '../../convex/_generated/dataModel';
 
 export type GameScreen = 'home' | 'lobby' | 'game';
 export type GamePhase = 'reinforce' | 'attack' | 'fortify';

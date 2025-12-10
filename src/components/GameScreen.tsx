@@ -7,6 +7,7 @@ import { GameMap } from './GameMap';
 import { GameSidebar } from './GameSidebar';
 import { CombatModal } from './CombatModal';
 import { CardPanel } from './CardPanel';
+import { ChatPanel } from './ChatPanel';
 import { TERRITORIES } from '../game/territories';
 
 export function GameScreen() {
@@ -14,6 +15,7 @@ export function GameScreen() {
   const [targetTerritory, setTargetTerritory] = useState<string | null>(null);
   const [showCombatModal, setShowCombatModal] = useState(false);
   const [showCardPanel, setShowCardPanel] = useState(false);
+  const [showChat, setShowChat] = useState(false);
   const [aiThinking, setAIThinking] = useState(false);
   const aiTurnInProgress = useRef(false);
 
@@ -394,6 +396,16 @@ export function GameScreen() {
           isMyTurn={isMyTurn}
           phase={game.phase}
           onClose={() => setShowCardPanel(false)}
+        />
+      )}
+
+      {/* Chat */}
+      {roomId && userId && (
+        <ChatPanel
+          roomId={roomId}
+          userId={userId}
+          isCollapsed={!showChat}
+          onToggle={() => setShowChat(!showChat)}
         />
       )}
 
