@@ -1,0 +1,215 @@
+@import "tailwindcss";
+
+/* Variaveis globais */
+:root {
+  --color-primary: #e94560;
+  --color-secondary: #0f3460;
+  --color-background: #1a1a2e;
+  --color-surface: #16213e;
+}
+
+/* Reset e base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  min-height: 100vh;
+  color: #fff;
+  overflow: hidden;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* Scrollbar customizada */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-primary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #ff6b6b;
+}
+
+/* Animacoes */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+@keyframes roll-dice {
+  0% { transform: rotate(0deg) scale(0.5); }
+  50% { transform: rotate(180deg) scale(1.2); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(100px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.animate-pulse { animation: pulse 2s infinite; }
+.animate-bounce { animation: bounce 1s infinite; }
+.animate-shake { animation: shake 0.5s; }
+.animate-roll-dice { animation: roll-dice 0.5s ease-out; }
+.animate-fade-in { animation: fade-in 0.3s ease-out; }
+.animate-slide-in { animation: slide-in-right 0.3s ease-out; }
+
+/* Estilos para o mapa */
+.territory {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  stroke: #1a1a2e;
+  stroke-width: 2;
+}
+
+.territory:hover {
+  filter: brightness(1.3);
+  stroke: #fff;
+  stroke-width: 3;
+}
+
+.territory.selected {
+  stroke: #ffd700;
+  stroke-width: 4;
+  filter: brightness(1.2);
+}
+
+.territory.attack-target {
+  stroke: #e74c3c;
+  stroke-width: 3;
+  animation: pulse 1s infinite;
+}
+
+.territory.fortify-target {
+  stroke: #2ecc71;
+  stroke-width: 3;
+}
+
+/* Glassmorphism */
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Botoes */
+.btn {
+  @apply px-4 py-2 rounded-lg font-semibold transition-all duration-200;
+  @apply hover:transform hover:-translate-y-0.5 hover:shadow-lg;
+  @apply active:transform active:translate-y-0;
+  @apply disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none;
+}
+
+.btn-primary {
+  @apply bg-gradient-to-r from-rose-500 to-pink-500 text-white;
+  @apply hover:shadow-rose-500/40;
+}
+
+.btn-secondary {
+  @apply bg-white/20 text-white;
+  @apply hover:bg-white/30;
+}
+
+.btn-attack {
+  @apply bg-gradient-to-r from-red-600 to-red-500 text-white;
+  @apply hover:shadow-red-500/40;
+}
+
+.btn-fortify {
+  @apply bg-gradient-to-r from-green-600 to-green-500 text-white;
+  @apply hover:shadow-green-500/40;
+}
+
+/* Cards / Paineis */
+.panel {
+  @apply bg-black/40 rounded-xl p-4 border border-white/10;
+}
+
+/* Inputs */
+.input {
+  @apply w-full px-4 py-2 rounded-lg bg-white/20 text-white border border-white/20;
+  @apply focus:outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20;
+  @apply placeholder:text-white/50;
+}
+
+/* Dados */
+.dice {
+  @apply w-12 h-12 bg-white rounded-lg flex items-center justify-center;
+  @apply text-xl font-bold text-gray-900 shadow-lg;
+}
+
+.dice.attacker {
+  @apply border-4 border-red-500;
+}
+
+.dice.defender {
+  @apply border-4 border-blue-500;
+}
+
+.dice.winner {
+  @apply bg-green-500 text-white;
+}
+
+.dice.loser {
+  @apply bg-gray-500 text-white;
+}
+
+/* Cores dos jogadores */
+.player-red { --player-color: #e74c3c; }
+.player-blue { --player-color: #3498db; }
+.player-green { --player-color: #2ecc71; }
+.player-orange { --player-color: #f39c12; }
+.player-purple { --player-color: #9b59b6; }
+.player-cyan { --player-color: #1abc9c; }
+
+/* Notificacao */
+.notification {
+  @apply fixed bottom-4 left-1/2 -translate-x-1/2 z-50;
+  @apply px-6 py-3 rounded-lg shadow-lg;
+  @apply bg-rose-500/90 text-white font-medium;
+  @apply animate-fade-in;
+}
+
+/* Modal */
+.modal-overlay {
+  @apply fixed inset-0 bg-black/80 flex items-center justify-center z-50;
+}
+
+.modal-content {
+  @apply bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl p-6;
+  @apply border-2 border-rose-500 shadow-2xl;
+  @apply animate-fade-in;
+  @apply max-w-lg w-full mx-4;
+}
