@@ -1,19 +1,11 @@
 import { mutation, internalMutation, action } from "./_generated/server";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
-import { TERRITORIES, CONTINENTS, areNeighbors, getNeighbors } from "./territories";
+import { CONTINENTS, getNeighbors } from "./territories";
+import type { Id } from "./_generated/dataModel";
 
 // Tipos de estrategia de IA
 type AIStrategy = "aggressive" | "defensive" | "balanced";
-
-// Interface para territorio com dados calculados
-interface TerritoryState {
-  territoryId: string;
-  ownerId: string | null;
-  armies: number;
-  continent: string;
-  neighbors: string[];
-}
 
 // Cria um jogador de IA
 export const createAIPlayer = mutation({
@@ -507,7 +499,7 @@ function rollDice(count: number): number[] {
   return rolls;
 }
 
-function findValidCardCombination(cards: any[]): string[] | null {
+function findValidCardCombination(cards: any[]): Id<"cards">[] | null {
   if (cards.length < 3) return null;
 
   // Tenta encontrar 3 iguais

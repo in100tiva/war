@@ -820,7 +820,7 @@ function calculateReinforcements(territories: { territoryId: string }[]): number
   // Bonus por continentes
   const territoryIds = territories.map((t) => t.territoryId);
 
-  for (const [continentId, continent] of Object.entries(CONTINENTS)) {
+  for (const [, continent] of Object.entries(CONTINENTS)) {
     const ownsAll = continent.territories.every((t) => territoryIds.includes(t));
     if (ownsAll) {
       reinforcements += continent.bonus;

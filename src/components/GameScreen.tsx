@@ -8,7 +8,12 @@ import { GameSidebar } from './GameSidebar';
 import { CombatModal } from './CombatModal';
 import { CardPanel } from './CardPanel';
 import { ChatPanel } from './ChatPanel';
+import { TurnIndicator } from './TurnIndicator';
 import { TERRITORIES } from '../game/territories';
+import { Button } from './ui/button';
+import { Card, CardContent } from './ui/card';
+import { Badge } from './ui/badge';
+import { Trophy, RotateCcw, MessageCircle, PanelRightClose, PanelRight } from 'lucide-react';
 
 export function GameScreen() {
   const { roomId, userId, selectedTerritory, setSelectedTerritory, clearSelection, isSoloGame } = useGameStore();
@@ -16,6 +21,7 @@ export function GameScreen() {
   const [showCombatModal, setShowCombatModal] = useState(false);
   const [showCardPanel, setShowCardPanel] = useState(false);
   const [showChat, setShowChat] = useState(false);
+  const [showSidebar, setShowSidebar] = useState(true);
   const [aiThinking, setAIThinking] = useState(false);
   const aiTurnInProgress = useRef(false);
 
@@ -276,12 +282,6 @@ export function GameScreen() {
     );
   }
 
-  const phaseNames = {
-    reinforce: 'Reforcos',
-    attack: 'Ataque',
-    fortify: 'Fortificacao',
-  };
-
   // Dados para o modal de combate
   const attackerTerritory = selectedTerritory ? territoriesMap[selectedTerritory] : null;
   const defenderTerritory = targetTerritory ? territoriesMap[targetTerritory] : null;
@@ -289,57 +289,26 @@ export function GameScreen() {
   const defenderPlayer = players.find((p) => p.userId === defenderTerritory?.ownerId);
 
   return (
-    <div className="h-screen flex flex-col">
-      {/* Header */}
-      <header className="bg-black/40 border-b border-white/10 px-4 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <div
-            className="px-4 py-1 rounded-lg font-semibold"
-            style={{ backgroundColor: currentPlayer.color }}
-          >
-            {currentPlayer.user?.name || 'Jogador'}
-          </div>
-          <div className="text-yellow-400 font-medium">
-            Fase: {phaseNames[game.phase]}
-          </div>
-          {game.phase === 'reinforce' && (
-            <div className="text-white/70">
-              Reforcos: {game.reinforcementsLeft}
-            </div>
-          )}
-        </div>
-
-        {isMyTurn && (
-          <div className="flex items-center gap-2">
-            {game.phase !== 'fortify' && (
-              <button onClick={handleNextPhase} className="btn btn-secondary">
-                Proxima Fase
-              </button>
-            )}
-            <button onClick={handleEndTurn} className="btn btn-primary">
-              Finalizar Turno
-            </button>
-          </div>
-        )}
-
-        {!isMyTurn && (
-          <div className="flex items-center gap-2 text-white/50">
-            {isCurrentPlayerAI && aiThinking ? (
-              <>
-                <div className="animate-spin w-4 h-4 border-2 border-white/30 border-t-white rounded-full"></div>
-                <span>IA pensando...</span>
-              </>
-            ) : (
-              <span>Aguardando {currentPlayer.user?.name}{isCurrentPlayerAI ? ' (IA)' : ''}...</span>
-            )}
-          </div>
-        )}
-      </header>
+    <div className="h-screen flex flex-col bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+      {/* Turn Indicator Header */}
+      <TurnIndicator
+        currentPlayer={{
+          name: currentPlayer.user?.name || 'Jogador',
+          color: currentPlayer.color,
+          isAI: isCurrentPlayerAI,
+        }}
+        phase={game.phase}
+        isMyTurn={isMyTurn}
+        reinforcementsLeft={game.reinforcementsLeft}
+        aiThinking={aiThinking}
+        onNextPhase={handleNextPhase}
+        onEndTurn={handleEndTurn}
+      />
 
       {/* Conteudo principal */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-hidden relative">
         {/* Mapa */}
-        <main className="flex-1 bg-gradient-to-b from-blue-900/50 to-blue-950/50">
+        <main className="flex-1 bg-gradient-to-b from-blue-900/30 to-blue-950/30 relative">
           <GameMap
             territories={territoriesMap}
             players={players.map((p) => ({
@@ -351,19 +320,41 @@ export function GameScreen() {
             phase={game.phase}
             onTerritoryClick={handleTerritoryClick}
           />
+
+          {/* Floating Action Buttons */}
+          <div className="absolute bottom-4 left-4 flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setShowSidebar(!showSidebar)}
+              className="bg-black/50 backdrop-blur-sm"
+            >
+              {showSidebar ? <PanelRightClose className="h-4 w-4" /> : <PanelRight className="h-4 w-4" />}
+            </Button>
+            <Button
+              variant={showChat ? "default" : "outline"}
+              size="icon"
+              onClick={() => setShowChat(!showChat)}
+              className={showChat ? "" : "bg-black/50 backdrop-blur-sm"}
+            >
+              <MessageCircle className="h-4 w-4" />
+            </Button>
+          </div>
         </main>
 
         {/* Sidebar */}
-        <GameSidebar
-          players={players}
-          currentPlayerId={currentPlayer.userId}
-          selectedTerritory={selectedTerritory}
-          territories={territoriesMap}
-          phase={game.phase}
-          reinforcementsLeft={game.reinforcementsLeft}
-          cardCount={playerCards?.length || 0}
-          onOpenCards={() => setShowCardPanel(true)}
-        />
+        {showSidebar && (
+          <GameSidebar
+            players={players}
+            currentPlayerId={currentPlayer.userId}
+            selectedTerritory={selectedTerritory}
+            territories={territoriesMap}
+            phase={game.phase}
+            reinforcementsLeft={game.reinforcementsLeft}
+            cardCount={playerCards?.length || 0}
+            onOpenCards={() => setShowCardPanel(true)}
+          />
+        )}
       </div>
 
       {/* Modal de combate */}
@@ -411,19 +402,38 @@ export function GameScreen() {
 
       {/* Notificacao de vitoria */}
       {game.winnerId && (
-        <div className="modal-overlay">
-          <div className="modal-content text-center">
-            <h2 className="text-3xl font-bold text-yellow-400 mb-4">Fim de Jogo!</h2>
-            <p className="text-xl mb-6">
-              {players.find((p) => p.userId === game.winnerId)?.user?.name} conquistou o mundo!
-            </p>
-            <button
-              onClick={() => window.location.reload()}
-              className="btn btn-primary"
-            >
-              Novo Jogo
-            </button>
-          </div>
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
+          <Card className="max-w-md w-full mx-4 text-center animate-fade-in border-yellow-500/50">
+            <CardContent className="pt-8 pb-6">
+              <div className="w-20 h-20 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-yellow-500/30">
+                <Trophy className="h-10 w-10 text-white" />
+              </div>
+
+              <h2 className="text-3xl font-bold text-yellow-400 mb-2">Vitoria!</h2>
+
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <div
+                  className="w-6 h-6 rounded-full"
+                  style={{ backgroundColor: players.find((p) => p.userId === game.winnerId)?.color }}
+                />
+                <p className="text-xl text-white">
+                  {players.find((p) => p.userId === game.winnerId)?.user?.name} conquistou o mundo!
+                </p>
+              </div>
+
+              <Badge variant="secondary" className="mb-6">
+                Turno {game.turnNumber}
+              </Badge>
+
+              <Button
+                onClick={() => window.location.reload()}
+                className="w-full gap-2"
+              >
+                <RotateCcw className="h-4 w-4" />
+                Novo Jogo
+              </Button>
+            </CardContent>
+          </Card>
         </div>
       )}
     </div>
