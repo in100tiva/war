@@ -1,20 +1,29 @@
-import { useState, useCallback } from 'react';
-import { useQuery, useMutation } from 'convex/react';
+import { useState, useCallback, useEffect, useRef } from 'react';
+import { useQuery, useMutation, useAction } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { useGameStore } from '../stores/gameStore';
 import { playSound } from '../lib/audio';
 import { GameMap } from './GameMap';
 import { GameSidebar } from './GameSidebar';
 import { CombatModal } from './CombatModal';
+import { CardPanel } from './CardPanel';
 import { TERRITORIES } from '../game/territories';
 
 export function GameScreen() {
-  const { roomId, userId, selectedTerritory, setSelectedTerritory, clearSelection } = useGameStore();
+  const { roomId, userId, selectedTerritory, setSelectedTerritory, clearSelection, isSoloGame } = useGameStore();
   const [targetTerritory, setTargetTerritory] = useState<string | null>(null);
   const [showCombatModal, setShowCombatModal] = useState(false);
+  const [showCardPanel, setShowCardPanel] = useState(false);
+  const [aiThinking, setAIThinking] = useState(false);
+  const aiTurnInProgress = useRef(false);
 
   // Queries
   const gameState = useQuery(api.game.getState, roomId ? { roomId } : 'skip');
+  const game = gameState?.game;
+  const playerCards = useQuery(
+    api.game.getPlayerCards,
+    game && userId ? { gameId: game._id, userId } : 'skip'
+  );
 
   // Mutations
   const reinforce = useMutation(api.game.reinforce);
@@ -23,12 +32,42 @@ export function GameScreen() {
   const attack = useMutation(api.game.attack);
   const fortify = useMutation(api.game.fortify);
 
-  const game = gameState?.game;
+  // Actions
+  const executeAITurn = useAction(api.ai.executeAITurn);
+
   const territories = gameState?.territories || [];
   const players = gameState?.players || [];
   const currentPlayer = gameState?.currentPlayer;
+  const isCurrentPlayerAI = gameState?.isCurrentPlayerAI || false;
 
   const isMyTurn = currentPlayer?.userId === userId;
+
+  // Trigger AI turn when it's an AI's turn
+  useEffect(() => {
+    if (!game || !currentPlayer || !isCurrentPlayerAI || aiTurnInProgress.current) {
+      return;
+    }
+
+    if (isSoloGame && isCurrentPlayerAI && !game.winnerId) {
+      aiTurnInProgress.current = true;
+      setAIThinking(true);
+
+      const aiDifficulty = (currentPlayer as { aiDifficulty?: string }).aiDifficulty || 'medium';
+
+      executeAITurn({
+        gameId: game._id,
+        aiUserId: currentPlayer.userId,
+        difficulty: aiDifficulty as 'easy' | 'medium' | 'hard',
+      })
+        .catch((error) => {
+          console.error('AI turn error:', error);
+        })
+        .finally(() => {
+          aiTurnInProgress.current = false;
+          setAIThinking(false);
+        });
+    }
+  }, [game, currentPlayer, isCurrentPlayerAI, isSoloGame, executeAITurn]);
 
   // Converte territorios para formato de mapa
   const territoriesMap: Record<string, { ownerId: string | null; armies: number }> = {};
@@ -282,8 +321,15 @@ export function GameScreen() {
         )}
 
         {!isMyTurn && (
-          <div className="text-white/50">
-            Aguardando {currentPlayer.user?.name}...
+          <div className="flex items-center gap-2 text-white/50">
+            {isCurrentPlayerAI && aiThinking ? (
+              <>
+                <div className="animate-spin w-4 h-4 border-2 border-white/30 border-t-white rounded-full"></div>
+                <span>IA pensando...</span>
+              </>
+            ) : (
+              <span>Aguardando {currentPlayer.user?.name}{isCurrentPlayerAI ? ' (IA)' : ''}...</span>
+            )}
           </div>
         )}
       </header>
@@ -313,6 +359,8 @@ export function GameScreen() {
           territories={territoriesMap}
           phase={game.phase}
           reinforcementsLeft={game.reinforcementsLeft}
+          cardCount={playerCards?.length || 0}
+          onOpenCards={() => setShowCardPanel(true)}
         />
       </div>
 
@@ -335,6 +383,17 @@ export function GameScreen() {
           onRollDice={handleRollDice}
           onClose={handleCombatClose}
           onConquest={handleConquest}
+        />
+      )}
+
+      {/* Painel de cartas */}
+      {showCardPanel && game && userId && (
+        <CardPanel
+          gameId={game._id}
+          userId={userId}
+          isMyTurn={isMyTurn}
+          phase={game.phase}
+          onClose={() => setShowCardPanel(false)}
         />
       )}
 

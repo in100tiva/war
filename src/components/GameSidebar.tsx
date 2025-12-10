@@ -16,6 +16,8 @@ interface GameSidebarProps {
   territories: Record<string, { ownerId: string | null; armies: number }>;
   phase: 'reinforce' | 'attack' | 'fortify';
   reinforcementsLeft: number;
+  cardCount: number;
+  onOpenCards: () => void;
 }
 
 export function GameSidebar({
@@ -25,6 +27,8 @@ export function GameSidebar({
   territories,
   phase,
   reinforcementsLeft,
+  cardCount,
+  onOpenCards,
 }: GameSidebarProps) {
   const selectedTerritoryData = selectedTerritory ? TERRITORIES[selectedTerritory] : null;
   const selectedTerritoryState = selectedTerritory ? territories[selectedTerritory] : null;
@@ -80,6 +84,20 @@ export function GameSidebar({
             <p className="text-yellow-400 font-medium">
               Reforcos disponiveis: {reinforcementsLeft}
             </p>
+            <button
+              onClick={onOpenCards}
+              className={`
+                w-full mt-2 px-4 py-2 rounded-lg font-semibold transition-all
+                flex items-center justify-center gap-2
+                ${cardCount >= 5
+                  ? 'bg-yellow-600 hover:bg-yellow-500 text-white animate-pulse'
+                  : 'bg-gray-700 hover:bg-gray-600 text-white'}
+              `}
+            >
+              <span>🃏</span>
+              <span>Cartas ({cardCount})</span>
+              {cardCount >= 5 && <span className="text-xs">⚠️</span>}
+            </button>
           </div>
         )}
         {phase === 'attack' && (

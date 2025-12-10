@@ -81,7 +81,7 @@ export function GameMap({
   return (
     <div className="relative w-full h-full flex items-center justify-center p-4">
       <svg
-        viewBox="0 0 1000 620"
+        viewBox="0 0 1500 1350"
         className="w-full h-full max-h-[calc(100vh-120px)]"
         style={{ filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3))' }}
       >
@@ -117,7 +117,7 @@ export function GameMap({
         </defs>
 
         {/* Fundo */}
-        <rect width="1000" height="620" fill="url(#ocean-gradient)" />
+        <rect width="1500" height="1350" fill="url(#ocean-gradient)" />
 
         {/* Linhas de conexao oceânicas */}
         <g className="connections" opacity={0.3}>
