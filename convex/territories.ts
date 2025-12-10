@@ -8,51 +8,51 @@ export const CONTINENTS: Record<string, {
   northAmerica: {
     name: "America do Norte",
     bonus: 5,
-    color: "#3d7c47",
+    color: "#228b22",
     territories: [
-      "alaska", "territoriosNoroeste", "groelandia", "alberta",
-      "ontario", "quebec", "estadosUnidosOeste", "estadosUnidosLeste", "americaCentral"
+      "alaska", "alberta", "americaCentral", "estadosUnidos",
+      "groelandia", "mexico", "novaYork", "ottawa", "vancouver"
     ],
   },
   southAmerica: {
     name: "America do Sul",
     bonus: 2,
-    color: "#5a9c4a",
-    territories: ["venezuela", "peru", "brasil", "argentina"],
+    color: "#ffd700",
+    territories: ["argentina", "brasil", "peru", "venezuela"],
   },
   europe: {
     name: "Europa",
     bonus: 5,
-    color: "#4a6fa5",
+    color: "#4169e1",
     territories: [
-      "islandia", "escandanavia", "graBretenha", "europaOcidental",
-      "europaSul", "europaNorte", "russia"
+      "alemanha", "franca", "gra-bretanha", "islandia",
+      "italia", "polonia", "russia"
     ],
   },
   africa: {
     name: "Africa",
     bonus: 3,
-    color: "#c4883a",
+    color: "#ff8c00",
     territories: [
-      "africaDoNorte", "egito", "africaOriental", "congo",
-      "africaDoSul", "madagascar"
+      "argelia", "egito", "congo", "africaDoSul",
+      "madagascar", "nigeria"
     ],
   },
   asia: {
     name: "Asia",
     bonus: 7,
-    color: "#8b6343",
+    color: "#8b4513",
     territories: [
-      "orienteMedio", "afeganistao", "ural", "siberia", "yakutia",
-      "irkutsk", "mongolia", "china", "india", "sudesteasiatico",
-      "japao", "kamchatka"
+      "arabia", "bangladesh", "cazaquistao", "china", "coreia",
+      "india", "japao", "mongolia", "oriente-medio", "siberia",
+      "tailandia", "turquia"
     ],
   },
   oceania: {
     name: "Oceania",
     bonus: 2,
-    color: "#a63d5a",
-    territories: ["indonesia", "novaGuine", "australiaOeste", "australiaLeste"],
+    color: "#dc143c",
+    territories: ["australia", "indonesia", "novaZelandia", "perth"],
   },
 };
 
@@ -63,284 +63,267 @@ export const TERRITORIES: Record<string, {
   neighbors: string[];
   center: { x: number; y: number };
 }> = {
-  // ==================== AMERICA DO NORTE ====================
+  // America do Norte
   alaska: {
     name: "Alaska",
     continent: "northAmerica",
-    neighbors: ["territoriosNoroeste", "alberta", "kamchatka"],
-    center: { x: 75, y: 115 },
-  },
-  territoriosNoroeste: {
-    name: "Territorios do Noroeste",
-    continent: "northAmerica",
-    neighbors: ["alaska", "alberta", "ontario", "groelandia"],
-    center: { x: 200, y: 120 },
-  },
-  groelandia: {
-    name: "Groelandia",
-    continent: "northAmerica",
-    neighbors: ["territoriosNoroeste", "ontario", "quebec", "islandia"],
-    center: { x: 400, y: 105 },
+    neighbors: ["vancouver", "alberta", "siberia"],
+    center: { x: 70, y: 95 },
   },
   alberta: {
     name: "Alberta",
     continent: "northAmerica",
-    neighbors: ["alaska", "territoriosNoroeste", "ontario", "estadosUnidosOeste"],
-    center: { x: 120, y: 185 },
-  },
-  ontario: {
-    name: "Ontario",
-    continent: "northAmerica",
-    neighbors: ["territoriosNoroeste", "alberta", "quebec", "estadosUnidosOeste", "estadosUnidosLeste", "groelandia"],
-    center: { x: 220, y: 195 },
-  },
-  quebec: {
-    name: "Quebec",
-    continent: "northAmerica",
-    neighbors: ["ontario", "estadosUnidosLeste", "groelandia"],
-    center: { x: 335, y: 200 },
-  },
-  estadosUnidosOeste: {
-    name: "EUA Oeste",
-    continent: "northAmerica",
-    neighbors: ["alberta", "ontario", "estadosUnidosLeste", "americaCentral"],
-    center: { x: 120, y: 285 },
-  },
-  estadosUnidosLeste: {
-    name: "EUA Leste",
-    continent: "northAmerica",
-    neighbors: ["ontario", "quebec", "estadosUnidosOeste", "americaCentral"],
-    center: { x: 240, y: 300 },
+    neighbors: ["alaska", "vancouver", "ottawa", "estadosUnidos"],
+    center: { x: 135, y: 115 },
   },
   americaCentral: {
     name: "America Central",
     continent: "northAmerica",
-    neighbors: ["estadosUnidosOeste", "estadosUnidosLeste", "venezuela"],
-    center: { x: 155, y: 395 },
+    neighbors: ["mexico", "venezuela"],
+    center: { x: 155, y: 270 },
+  },
+  estadosUnidos: {
+    name: "Estados Unidos",
+    continent: "northAmerica",
+    neighbors: ["alberta", "ottawa", "novaYork", "mexico"],
+    center: { x: 155, y: 185 },
+  },
+  groelandia: {
+    name: "Groelandia",
+    continent: "northAmerica",
+    neighbors: ["ottawa", "islandia"],
+    center: { x: 315, y: 65 },
+  },
+  mexico: {
+    name: "Mexico",
+    continent: "northAmerica",
+    neighbors: ["estadosUnidos", "americaCentral"],
+    center: { x: 115, y: 245 },
+  },
+  novaYork: {
+    name: "Nova York",
+    continent: "northAmerica",
+    neighbors: ["ottawa", "estadosUnidos"],
+    center: { x: 230, y: 165 },
+  },
+  ottawa: {
+    name: "Ottawa",
+    continent: "northAmerica",
+    neighbors: ["alberta", "estadosUnidos", "novaYork", "groelandia", "vancouver"],
+    center: { x: 220, y: 115 },
+  },
+  vancouver: {
+    name: "Vancouver",
+    continent: "northAmerica",
+    neighbors: ["alaska", "alberta", "ottawa"],
+    center: { x: 80, y: 145 },
   },
 
-  // ==================== AMERICA DO SUL ====================
-  venezuela: {
-    name: "Venezuela",
+  // America do Sul
+  argentina: {
+    name: "Argentina",
     continent: "southAmerica",
-    neighbors: ["americaCentral", "peru", "brasil"],
-    center: { x: 240, y: 490 },
+    neighbors: ["brasil", "peru"],
+    center: { x: 195, y: 455 },
+  },
+  brasil: {
+    name: "Brasil",
+    continent: "southAmerica",
+    neighbors: ["venezuela", "peru", "argentina", "nigeria"],
+    center: { x: 230, y: 370 },
   },
   peru: {
     name: "Peru",
     continent: "southAmerica",
     neighbors: ["venezuela", "brasil", "argentina"],
-    center: { x: 195, y: 605 },
+    center: { x: 155, y: 385 },
   },
-  brasil: {
-    name: "Brasil",
+  venezuela: {
+    name: "Venezuela",
     continent: "southAmerica",
-    neighbors: ["venezuela", "peru", "argentina", "africaDoNorte"],
-    center: { x: 305, y: 615 },
-  },
-  argentina: {
-    name: "Argentina",
-    continent: "southAmerica",
-    neighbors: ["peru", "brasil"],
-    center: { x: 245, y: 755 },
+    neighbors: ["americaCentral", "brasil", "peru"],
+    center: { x: 170, y: 320 },
   },
 
-  // ==================== EUROPA ====================
+  // Europa
+  alemanha: {
+    name: "Alemanha",
+    continent: "europe",
+    neighbors: ["franca", "italia", "polonia"],
+    center: { x: 490, y: 165 },
+  },
+  franca: {
+    name: "Franca",
+    continent: "europe",
+    neighbors: ["gra-bretanha", "alemanha", "italia", "argelia"],
+    center: { x: 440, y: 190 },
+  },
+  "gra-bretanha": {
+    name: "Gra-Bretanha",
+    continent: "europe",
+    neighbors: ["islandia", "franca"],
+    center: { x: 415, y: 140 },
+  },
   islandia: {
     name: "Islandia",
     continent: "europe",
-    neighbors: ["groelandia", "escandanavia", "graBretenha"],
-    center: { x: 520, y: 120 },
+    neighbors: ["groelandia", "gra-bretanha"],
+    center: { x: 390, y: 75 },
   },
-  escandanavia: {
-    name: "Escandanavia",
+  italia: {
+    name: "Italia",
     continent: "europe",
-    neighbors: ["islandia", "graBretenha", "europaNorte", "russia"],
-    center: { x: 625, y: 125 },
+    neighbors: ["franca", "alemanha", "polonia", "argelia", "egito"],
+    center: { x: 490, y: 225 },
   },
-  graBretenha: {
-    name: "Gra-Bretanha",
+  polonia: {
+    name: "Polonia",
     continent: "europe",
-    neighbors: ["islandia", "escandanavia", "europaOcidental", "europaNorte"],
-    center: { x: 530, y: 215 },
-  },
-  europaOcidental: {
-    name: "Europa Ocidental",
-    continent: "europe",
-    neighbors: ["graBretenha", "europaNorte", "europaSul", "africaDoNorte"],
-    center: { x: 525, y: 330 },
-  },
-  europaNorte: {
-    name: "Europa do Norte",
-    continent: "europe",
-    neighbors: ["graBretenha", "escandanavia", "europaOcidental", "europaSul", "russia"],
-    center: { x: 640, y: 265 },
-  },
-  europaSul: {
-    name: "Europa do Sul",
-    continent: "europe",
-    neighbors: ["europaOcidental", "europaNorte", "russia", "africaDoNorte", "egito", "orienteMedio"],
-    center: { x: 630, y: 415 },
+    neighbors: ["alemanha", "italia", "russia", "turquia"],
+    center: { x: 550, y: 155 },
   },
   russia: {
     name: "Russia",
     continent: "europe",
-    neighbors: ["escandanavia", "europaNorte", "europaSul", "ural", "afeganistao", "orienteMedio"],
-    center: { x: 790, y: 230 },
+    neighbors: ["polonia", "turquia", "siberia", "cazaquistao"],
+    center: { x: 605, y: 105 },
   },
 
-  // ==================== AFRICA ====================
-  africaDoNorte: {
-    name: "Africa do Norte",
+  // Africa
+  argelia: {
+    name: "Argelia",
     continent: "africa",
-    neighbors: ["europaOcidental", "europaSul", "egito", "africaOriental", "congo", "brasil"],
-    center: { x: 580, y: 510 },
+    neighbors: ["franca", "italia", "egito", "nigeria", "brasil"],
+    center: { x: 435, y: 280 },
   },
   egito: {
     name: "Egito",
     continent: "africa",
-    neighbors: ["europaSul", "africaDoNorte", "africaOriental", "orienteMedio"],
-    center: { x: 700, y: 525 },
-  },
-  africaOriental: {
-    name: "Africa Oriental",
-    continent: "africa",
-    neighbors: ["egito", "africaDoNorte", "congo", "africaDoSul", "madagascar"],
-    center: { x: 690, y: 695 },
+    neighbors: ["italia", "argelia", "nigeria", "oriente-medio"],
+    center: { x: 515, y: 295 },
   },
   congo: {
     name: "Congo",
     continent: "africa",
-    neighbors: ["africaDoNorte", "africaOriental", "africaDoSul"],
-    center: { x: 600, y: 690 },
+    neighbors: ["nigeria", "africaDoSul", "madagascar"],
+    center: { x: 495, y: 415 },
   },
   africaDoSul: {
     name: "Africa do Sul",
     continent: "africa",
-    neighbors: ["congo", "africaOriental", "madagascar"],
-    center: { x: 645, y: 875 },
+    neighbors: ["congo", "madagascar"],
+    center: { x: 505, y: 495 },
   },
   madagascar: {
     name: "Madagascar",
     continent: "africa",
-    neighbors: ["africaOriental", "africaDoSul"],
-    center: { x: 810, y: 845 },
+    neighbors: ["congo", "africaDoSul"],
+    center: { x: 575, y: 485 },
+  },
+  nigeria: {
+    name: "Nigeria",
+    continent: "africa",
+    neighbors: ["argelia", "egito", "congo", "brasil"],
+    center: { x: 455, y: 345 },
   },
 
-  // ==================== ASIA ====================
-  orienteMedio: {
-    name: "Oriente Medio",
+  // Asia
+  arabia: {
+    name: "Arabia",
     continent: "asia",
-    neighbors: ["europaSul", "russia", "egito", "afeganistao", "india"],
-    center: { x: 795, y: 480 },
+    neighbors: ["egito", "oriente-medio", "india"],
+    center: { x: 590, y: 315 },
   },
-  afeganistao: {
-    name: "Afeganistao",
+  bangladesh: {
+    name: "Bangladesh",
     continent: "asia",
-    neighbors: ["russia", "orienteMedio", "india", "china", "ural"],
-    center: { x: 905, y: 400 },
+    neighbors: ["india", "tailandia", "china"],
+    center: { x: 745, y: 310 },
   },
-  ural: {
-    name: "Ural",
+  cazaquistao: {
+    name: "Cazaquistao",
     continent: "asia",
-    neighbors: ["russia", "afeganistao", "siberia", "china"],
-    center: { x: 960, y: 270 },
-  },
-  siberia: {
-    name: "Siberia",
-    continent: "asia",
-    neighbors: ["ural", "china", "mongolia", "irkutsk", "yakutia"],
-    center: { x: 1105, y: 210 },
-  },
-  yakutia: {
-    name: "Yakutia",
-    continent: "asia",
-    neighbors: ["siberia", "irkutsk", "kamchatka"],
-    center: { x: 1245, y: 175 },
-  },
-  irkutsk: {
-    name: "Irkutsk",
-    continent: "asia",
-    neighbors: ["siberia", "yakutia", "mongolia", "kamchatka"],
-    center: { x: 1215, y: 380 },
-  },
-  mongolia: {
-    name: "Mongolia",
-    continent: "asia",
-    neighbors: ["siberia", "irkutsk", "china", "japao", "kamchatka"],
-    center: { x: 1110, y: 430 },
+    neighbors: ["russia", "siberia", "mongolia", "china", "turquia"],
+    center: { x: 700, y: 130 },
   },
   china: {
     name: "China",
     continent: "asia",
-    neighbors: ["afeganistao", "ural", "siberia", "mongolia", "india", "sudesteasiatico"],
-    center: { x: 1045, y: 505 },
+    neighbors: ["cazaquistao", "mongolia", "coreia", "india", "bangladesh", "tailandia"],
+    center: { x: 770, y: 205 },
+  },
+  coreia: {
+    name: "Coreia",
+    continent: "asia",
+    neighbors: ["china", "japao", "mongolia"],
+    center: { x: 865, y: 215 },
   },
   india: {
     name: "India",
     continent: "asia",
-    neighbors: ["orienteMedio", "afeganistao", "china", "sudesteasiatico"],
-    center: { x: 935, y: 615 },
-  },
-  sudesteasiatico: {
-    name: "Sudeste Asiatico",
-    continent: "asia",
-    neighbors: ["india", "china", "indonesia"],
-    center: { x: 1085, y: 725 },
+    neighbors: ["oriente-medio", "arabia", "bangladesh", "china", "tailandia"],
+    center: { x: 670, y: 350 },
   },
   japao: {
     name: "Japao",
     continent: "asia",
-    neighbors: ["mongolia", "kamchatka"],
-    center: { x: 1285, y: 520 },
+    neighbors: ["coreia", "mongolia"],
+    center: { x: 930, y: 190 },
   },
-  kamchatka: {
-    name: "Kamchatka",
+  mongolia: {
+    name: "Mongolia",
     continent: "asia",
-    neighbors: ["yakutia", "irkutsk", "mongolia", "japao", "alaska"],
-    center: { x: 1380, y: 260 },
+    neighbors: ["cazaquistao", "siberia", "china", "coreia", "japao"],
+    center: { x: 805, y: 140 },
+  },
+  "oriente-medio": {
+    name: "Oriente Medio",
+    continent: "asia",
+    neighbors: ["egito", "turquia", "arabia", "india"],
+    center: { x: 600, y: 255 },
+  },
+  siberia: {
+    name: "Siberia",
+    continent: "asia",
+    neighbors: ["russia", "cazaquistao", "mongolia", "alaska"],
+    center: { x: 765, y: 70 },
+  },
+  tailandia: {
+    name: "Tailandia",
+    continent: "asia",
+    neighbors: ["india", "bangladesh", "china", "indonesia"],
+    center: { x: 800, y: 375 },
+  },
+  turquia: {
+    name: "Turquia",
+    continent: "asia",
+    neighbors: ["polonia", "russia", "cazaquistao", "oriente-medio"],
+    center: { x: 625, y: 200 },
   },
 
-  // ==================== OCEANIA ====================
+  // Oceania
+  australia: {
+    name: "Australia",
+    continent: "oceania",
+    neighbors: ["indonesia", "perth", "novaZelandia"],
+    center: { x: 870, y: 520 },
+  },
   indonesia: {
     name: "Indonesia",
     continent: "oceania",
-    neighbors: ["sudesteasiatico", "novaGuine", "australiaOeste"],
-    center: { x: 1170, y: 915 },
+    neighbors: ["tailandia", "australia", "perth"],
+    center: { x: 825, y: 440 },
   },
-  novaGuine: {
-    name: "Nova Guine",
+  novaZelandia: {
+    name: "Nova Zelandia",
     continent: "oceania",
-    neighbors: ["indonesia", "australiaLeste"],
-    center: { x: 1320, y: 975 },
+    neighbors: ["australia"],
+    center: { x: 960, y: 570 },
   },
-  australiaOeste: {
-    name: "Australia Ocidental",
+  perth: {
+    name: "Perth",
     continent: "oceania",
-    neighbors: ["indonesia", "australiaLeste"],
-    center: { x: 1175, y: 1125 },
-  },
-  australiaLeste: {
-    name: "Australia Oriental",
-    continent: "oceania",
-    neighbors: ["novaGuine", "australiaOeste"],
-    center: { x: 1340, y: 1160 },
+    neighbors: ["indonesia", "australia"],
+    center: { x: 785, y: 520 },
   },
 };
-
-// Helper para verificar se dois territorios sao vizinhos
-export function areNeighbors(territory1: string, territory2: string): boolean {
-  const t1 = TERRITORIES[territory1];
-  if (!t1) return false;
-  return t1.neighbors.includes(territory2);
-}
-
-// Helper para pegar vizinhos de um territorio
-export function getNeighbors(territoryId: string): string[] {
-  return TERRITORIES[territoryId]?.neighbors || [];
-}
-
-// Helper para pegar continente de um territorio
-export function getContinent(territoryId: string): string | null {
-  return TERRITORIES[territoryId]?.continent || null;
-}
