@@ -3,6 +3,7 @@ import { useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { useGameStore } from '../stores/gameStore';
 import { playSound } from '../lib/audio';
+import { SoloGameModal } from './SoloGameModal';
 
 export function HomeScreen() {
   const [name, setName] = useState(useGameStore.getState().userName || '');
@@ -10,6 +11,7 @@ export function HomeScreen() {
   const [isCreating, setIsCreating] = useState(false);
   const [isJoining, setIsJoining] = useState(false);
   const [error, setError] = useState('');
+  const [showSoloModal, setShowSoloModal] = useState(false);
 
   const { setScreen, setRoom, setUser, visitorId } = useGameStore();
 
@@ -83,11 +85,14 @@ export function HomeScreen() {
     }
   };
 
-  // Modo local (sem backend)
-  const handleLocalGame = () => {
+  // Modo solo contra IA
+  const handleSoloGame = () => {
+    if (!name.trim()) {
+      setError('Digite seu nome primeiro');
+      return;
+    }
     playSound.click();
-    // TODO: Implementar modo local
-    setError('Modo local em desenvolvimento');
+    setShowSoloModal(true);
   };
 
   return (
@@ -167,10 +172,10 @@ export function HomeScreen() {
           </div>
 
           <button
-            onClick={handleLocalGame}
+            onClick={handleSoloGame}
             className="btn btn-secondary w-full"
           >
-            Jogar Localmente
+            Jogar contra IA
           </button>
         </div>
 
@@ -186,6 +191,13 @@ export function HomeScreen() {
       <div className="mt-8 text-center text-white/40 text-sm">
         <p>Conquiste territorios. Domine o mundo.</p>
       </div>
+
+      {/* Modal de jogo solo */}
+      <SoloGameModal
+        isOpen={showSoloModal}
+        playerName={name}
+        onClose={() => setShowSoloModal(false)}
+      />
     </div>
   );
 }

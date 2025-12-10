@@ -169,17 +169,22 @@ export const getState = query({
         return {
           ...player,
           user,
+          isAI: user?.isAI || false,
+          aiDifficulty: user?.aiDifficulty || null,
           territoryCount: playerTerritories.length,
           armyCount: playerTerritories.reduce((sum, t) => sum + t.armies, 0),
         };
       })
     );
 
+    const currentPlayer = playersWithUsers[game.currentPlayerIndex];
+
     return {
       game,
       territories,
       players: playersWithUsers,
-      currentPlayer: playersWithUsers[game.currentPlayerIndex],
+      currentPlayer,
+      isCurrentPlayerAI: currentPlayer?.isAI || false,
     };
   },
 });
@@ -621,6 +626,175 @@ export const fortify = mutation({
     });
   },
 });
+
+// Busca cartas do jogador
+export const getPlayerCards = query({
+  args: {
+    gameId: v.id("games"),
+    userId: v.id("users"),
+  },
+  handler: async (ctx, args) => {
+    const cards = await ctx.db
+      .query("cards")
+      .withIndex("by_game", (q) => q.eq("gameId", args.gameId))
+      .filter((q) => q.eq(q.field("playerId"), args.userId))
+      .collect();
+
+    return cards.map((card) => ({
+      _id: card._id,
+      territoryId: card.territoryId,
+      symbol: card.symbol,
+      territoryName: TERRITORIES[card.territoryId]?.name || card.territoryId,
+    }));
+  },
+});
+
+// Troca cartas por reforcos
+export const tradeCards = mutation({
+  args: {
+    gameId: v.id("games"),
+    userId: v.id("users"),
+    cardIds: v.array(v.id("cards")),
+  },
+  handler: async (ctx, args) => {
+    const game = await ctx.db.get(args.gameId);
+    if (!game) throw new Error("Jogo nao encontrado");
+
+    if (game.phase !== "reinforce") {
+      throw new Error("Voce so pode trocar cartas na fase de reforcos");
+    }
+
+    const players = await ctx.db
+      .query("gamePlayers")
+      .withIndex("by_room", (q) => q.eq("roomId", game.roomId))
+      .collect();
+
+    const currentPlayer = players[game.currentPlayerIndex];
+    if (currentPlayer.userId !== args.userId) {
+      throw new Error("Nao e seu turno");
+    }
+
+    if (args.cardIds.length !== 3) {
+      throw new Error("Voce deve trocar exatamente 3 cartas");
+    }
+
+    // Busca as cartas
+    const cards = await Promise.all(args.cardIds.map((id) => ctx.db.get(id)));
+
+    // Verifica se todas as cartas pertencem ao jogador
+    for (const card of cards) {
+      if (!card || card.playerId !== args.userId) {
+        throw new Error("Carta invalida ou nao pertence a voce");
+      }
+    }
+
+    // Verifica se e uma combinacao valida
+    const symbols = cards.map((c) => c!.symbol);
+    const isValid = isValidCardCombination(symbols);
+
+    if (!isValid) {
+      throw new Error("Combinacao de cartas invalida");
+    }
+
+    // Calcula bonus (progressivo)
+    const cardTradeCount = game.cardTradeCount || 0;
+    const bonus = calculateCardBonus(cardTradeCount);
+
+    // Bonus extra por territorio (se jogador controla um territorio de uma carta)
+    let territorryBonus = 0;
+    const playerTerritories = await ctx.db
+      .query("territories")
+      .withIndex("by_game", (q) => q.eq("gameId", args.gameId))
+      .filter((q) => q.eq(q.field("ownerId"), args.userId))
+      .collect();
+
+    const playerTerritoryIds = playerTerritories.map((t) => t.territoryId);
+    for (const card of cards) {
+      if (card && playerTerritoryIds.includes(card.territoryId) && card.symbol !== "joker") {
+        territorryBonus += 2;
+      }
+    }
+
+    // Retorna cartas ao baralho
+    for (const cardId of args.cardIds) {
+      await ctx.db.patch(cardId, { playerId: undefined });
+    }
+
+    // Adiciona reforcos
+    await ctx.db.patch(args.gameId, {
+      reinforcementsLeft: game.reinforcementsLeft + bonus + territorryBonus,
+      cardTradeCount: cardTradeCount + 1,
+    });
+
+    // Registra acao
+    await ctx.db.insert("gameActions", {
+      gameId: args.gameId,
+      playerId: args.userId,
+      actionType: "tradeCards",
+      data: {
+        cardIds: args.cardIds,
+        bonus,
+        territorryBonus,
+        totalBonus: bonus + territorryBonus,
+      },
+      timestamp: Date.now(),
+    });
+
+    return {
+      bonus,
+      territorryBonus,
+      totalBonus: bonus + territorryBonus,
+    };
+  },
+});
+
+// Verifica combinacao de cartas valida
+function isValidCardCombination(symbols: string[]): boolean {
+  const counts: Record<string, number> = {};
+  let jokers = 0;
+
+  for (const symbol of symbols) {
+    if (symbol === "joker") {
+      jokers++;
+    } else {
+      counts[symbol] = (counts[symbol] || 0) + 1;
+    }
+  }
+
+  // 3 iguais
+  if (Object.values(counts).some((c) => c + jokers >= 3)) {
+    return true;
+  }
+
+  // 3 diferentes (1 de cada)
+  const uniqueSymbols = Object.keys(counts);
+  if (uniqueSymbols.length === 3) {
+    return true;
+  }
+
+  // 2 diferentes + 1 coringa
+  if (uniqueSymbols.length === 2 && jokers >= 1) {
+    return true;
+  }
+
+  // 1 + 2 coringas
+  if (uniqueSymbols.length === 1 && jokers >= 2) {
+    return true;
+  }
+
+  return false;
+}
+
+// Calcula bonus de troca de cartas (progressivo)
+function calculateCardBonus(tradeCount: number): number {
+  // Sistema progressivo classico do War
+  const bonuses = [4, 6, 8, 10, 12, 15];
+  if (tradeCount < bonuses.length) {
+    return bonuses[tradeCount];
+  }
+  // Apos a 6a troca, incrementa de 5 em 5
+  return 15 + (tradeCount - 5) * 5;
+}
 
 // Funcoes auxiliares
 function shuffleArray<T>(array: T[]): T[] {

@@ -224,6 +224,96 @@ export const leave = mutation({
   },
 });
 
+// Cria jogo solo contra IA
+export const createSoloGame = mutation({
+  args: {
+    userId: v.id("users"),
+    aiCount: v.number(), // 1-5 IAs
+    difficulty: v.union(v.literal("easy"), v.literal("medium"), v.literal("hard")),
+  },
+  handler: async (ctx, args) => {
+    if (args.aiCount < 1 || args.aiCount > 5) {
+      throw new Error("Numero de IAs deve ser entre 1 e 5");
+    }
+
+    // Gera codigo unico
+    let code = generateRoomCode();
+    let existing = await ctx.db
+      .query("gameRooms")
+      .withIndex("by_code", (q) => q.eq("code", code))
+      .first();
+
+    while (existing) {
+      code = generateRoomCode();
+      existing = await ctx.db
+        .query("gameRooms")
+        .withIndex("by_code", (q) => q.eq("code", code))
+        .first();
+    }
+
+    // Cria a sala
+    const roomId = await ctx.db.insert("gameRooms", {
+      code,
+      hostId: args.userId,
+      status: "waiting",
+      maxPlayers: args.aiCount + 1,
+      settings: {
+        gameMode: "domination",
+        allowSpectators: false,
+      },
+      createdAt: Date.now(),
+    });
+
+    // Adiciona o jogador humano
+    await ctx.db.insert("gamePlayers", {
+      roomId,
+      userId: args.userId,
+      color: PLAYER_COLORS[0].color,
+      colorName: PLAYER_COLORS[0].name,
+      isReady: true,
+      isConnected: true,
+      joinedAt: Date.now(),
+    });
+
+    // Nomes para IAs
+    const aiNames = [
+      "General Bot",
+      "Comandante IA",
+      "Estrategista Virtual",
+      "Almirante Digital",
+      "Marechal Cyber",
+    ];
+
+    // Cria jogadores de IA
+    const aiPlayerIds: string[] = [];
+    for (let i = 0; i < args.aiCount; i++) {
+      const aiUserId = await ctx.db.insert("users", {
+        name: aiNames[i],
+        visitorId: `ai_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        isAI: true,
+        aiDifficulty: args.difficulty,
+        gamesPlayed: 0,
+        gamesWon: 0,
+        createdAt: Date.now(),
+      });
+
+      await ctx.db.insert("gamePlayers", {
+        roomId,
+        userId: aiUserId,
+        color: PLAYER_COLORS[i + 1].color,
+        colorName: PLAYER_COLORS[i + 1].name,
+        isReady: true,
+        isConnected: true,
+        joinedAt: Date.now(),
+      });
+
+      aiPlayerIds.push(aiUserId);
+    }
+
+    return { roomId, code, aiPlayerIds, difficulty: args.difficulty };
+  },
+});
+
 // Atualiza configuracoes da sala
 export const updateSettings = mutation({
   args: {

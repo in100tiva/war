@@ -7,6 +7,8 @@ export default defineSchema({
     name: v.string(),
     visitorId: v.optional(v.string()), // Para usuarios anonimos
     clerkId: v.optional(v.string()), // Para autenticacao futura
+    isAI: v.optional(v.boolean()), // Se e um jogador de IA
+    aiDifficulty: v.optional(v.union(v.literal("easy"), v.literal("medium"), v.literal("hard"))),
     gamesPlayed: v.number(),
     gamesWon: v.number(),
     createdAt: v.number(),
@@ -56,6 +58,7 @@ export default defineSchema({
     turnNumber: v.number(),
     reinforcementsLeft: v.number(),
     hasConqueredThisTurn: v.boolean(),
+    cardTradeCount: v.optional(v.number()), // Contador de trocas de cartas (para bonus progressivo)
     winnerId: v.optional(v.id("users")),
     startedAt: v.number(),
     finishedAt: v.optional(v.number()),

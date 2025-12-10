@@ -19,6 +19,13 @@ interface GameStore {
   roomCode: string | null;
   setRoom: (roomId: Id<'gameRooms'> | null, code: string | null) => void;
 
+  // IA
+  aiPlayerIds: string[];
+  aiDifficulty: 'easy' | 'medium' | 'hard' | null;
+  isSoloGame: boolean;
+  setAIConfig: (aiPlayerIds: string[], difficulty: 'easy' | 'medium' | 'hard') => void;
+  clearAIConfig: () => void;
+
   // Jogo
   selectedTerritory: string | null;
   targetTerritory: string | null;
@@ -67,6 +74,21 @@ export const useGameStore = create<GameStore>((set) => ({
   roomId: null,
   roomCode: null,
   setRoom: (roomId, roomCode) => set({ roomId, roomCode }),
+
+  // IA
+  aiPlayerIds: [],
+  aiDifficulty: null,
+  isSoloGame: false,
+  setAIConfig: (aiPlayerIds, difficulty) => set({
+    aiPlayerIds,
+    aiDifficulty: difficulty,
+    isSoloGame: true,
+  }),
+  clearAIConfig: () => set({
+    aiPlayerIds: [],
+    aiDifficulty: null,
+    isSoloGame: false,
+  }),
 
   // Jogo
   selectedTerritory: null,
